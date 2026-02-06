@@ -1488,20 +1488,18 @@ RatMouseMesenchyme.obj <- subset(RatMouseStroma.obj, idents = c("Mouse: FB:capsF
                                                         "Rat: TMC4", "Rat: vSMC/PC"))
 DimPlot(RatMouseMesenchyme.obj, reduction = "umap.cca", split.by = "species")
 
-# Fig. 3, 5 x 4 in
-DimPlot(RatMouseMesenchyme.obj, reduction = "umap.cca", group.by = "species")+ xlim(-13, 2) + ylim(-6, 6)+NoLegend()+
+DimPlot(RatMouseMesenchyme.obj, reduction = "umap.cca", group.by = "species")+ xlim(-13, 0) + ylim(-4, 6)+NoLegend()+
   ggtitle(NULL)
 ggsave(filename = "pic/Fig3A_1.pdf", plot = get_last_plot(), width = 5, height = 4)
 
-# Fig. 3, 12 x 5 in
 DimPlot(RatMouseMesenchyme.obj, reduction = "umap.cca", split.by = "species",
-        label = T, label.box = T, repel = T)+ xlim(-13, 2) + ylim(-6, 6)+
+        label = T, label.box = T, repel = T)+ xlim(-13, 0) + ylim(-4, 6)+
   theme(strip.text = element_text(size = 20, face = "bold"))
 ggsave(filename = "pic/Fig3A_2.pdf", plot = get_last_plot(), width = 12, height = 5)
 
 # Fig. 3, 5.6 x 8 in
 FeaturePlot(RatMouseMesenchyme.obj, features = c("Ltbr controlled genes1", "Cd34", "Pdgfra", "Pdgfrb"),
-            reduction = "umap.cca", split.by = "species") & coord_cartesian(xlim = c(-13, 2), ylim = c(-6, 6)) & theme(axis.title = element_blank())
+            reduction = "umap.cca", split.by = "species") & coord_cartesian(xlim = c(-13, 0), ylim = c(-4, 6)) & theme(axis.title = element_blank())
 ggsave(filename = "pic/Fig3C.pdf", plot = get_last_plot(), width = 5.6, height = 8, device = cairo_pdf)
 
 orth_MouseRat <- orthogene::report_orthologs(target_species = "mouse", reference_species = "rat", method_all_genes = "gprofiler", non121_strategy = "4") 
