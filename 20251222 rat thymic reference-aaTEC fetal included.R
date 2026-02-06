@@ -1497,6 +1497,25 @@ DimPlot(RatMouseMesenchyme.obj, reduction = "umap.cca", split.by = "species",
   theme(strip.text = element_text(size = 20, face = "bold"))
 ggsave(filename = "pic/Fig3A_2.pdf", plot = get_last_plot(), width = 12, height = 5)
 
+# examine similarities between rat and mouse mesenchymal subsets
+RatMouseMesenchyme_avg <- AverageExpression(RatMouseMesenchyme.obj, assays = "RNA", slot = "data")$RNA
+RatMouseMesenchyme_sd <- apply(RatMouseMesenchyme_avg, 1, sd)
+RatMouseMesenchyme_top_genes <- names(sort(RatMouseMesenchyme_sd, decreasing = TRUE))[1:1000]
+
+RatMouseMesenchyme_rat_cols <- grep("_Rat$", colnames(RatMouseMesenchyme_avg), value = TRUE)
+RatMouseMesenchyme_mouse_cols <- grep("_Mouse$", colnames(RatMouseMesenchyme_avg), value = TRUE)
+
+RatMouseMesenchyme_top_avg <- RatMouseMesenchyme_avg[RatMouseMesenchyme_top_genes, , drop = FALSE]
+RatMouseMesenchyme_rat_avg <- RatMouseMesenchyme_top_avg[, RatMouseMesenchyme_rat_cols, drop = FALSE]
+RatMouseMesenchyme_mouse_avg <- RatMouseMesenchyme_top_avg[, RatMouseMesenchyme_mouse_cols, drop = FALSE]
+
+RatMouseMesenchyme_cor <- cor(as.matrix(RatMouseMesenchyme_rat_avg),
+                              as.matrix(RatMouseMesenchyme_mouse_avg),
+                              method = "pearson")
+pdf("pic/Fig3D_RatMouseMesenchyme_cor_heatmap.pdf", width = 6.5, height = 5.5)
+heatmap(RatMouseMesenchyme_cor, Rowv = NA, Colv = NA, scale = "none", margins = c(8, 8))
+dev.off()
+
 # Fig. 3, 5.6 x 8 in
 FeaturePlot(RatMouseMesenchyme.obj, features = c("Ltbr controlled genes1", "Cd34", "Pdgfra", "Pdgfrb"),
             reduction = "umap.cca", split.by = "species") & coord_cartesian(xlim = c(-13, 0), ylim = c(-4, 6)) & theme(axis.title = element_blank())
