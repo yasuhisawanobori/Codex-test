@@ -1488,7 +1488,7 @@ RatMouseMesenchyme.obj <- subset(RatMouseStroma.obj, idents = c("Mouse: FB:capsF
                                                         "Rat: TMC4", "Rat: vSMC/PC"))
 DimPlot(RatMouseMesenchyme.obj, reduction = "umap.cca", split.by = "species")
 
-DimPlot(RatMouseMesenchyme.obj, reduction = "umap.cca", group.by = "species")+ xlim(-13, 0) + ylim(-4, 6)+NoLegend()+
+DimPlot(RatMouseMesenchyme.obj, reduction = "umap.cca", group.by = "species")+ xlim(-13, 2) + ylim(-4, 6)+NoLegend()+
   ggtitle(NULL)
 ggsave(filename = "pic/Fig3A_1.pdf", plot = get_last_plot(), width = 5, height = 4)
 
