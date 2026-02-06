@@ -1372,6 +1372,37 @@ DimPlot(subset(RatMouseStroma.obj, subset=species %in% "Rat"), group.by = "mixed
   NoLegend() + ggtitle("Projected labels to Rat")
 ggsave(filename = "pic/FigS2B_2.pdf", plot = get_last_plot(), width = 6, height = 5)
 
+# examine similarities between rat and mouse stromal subsets
+RatMouseStroma_avg <- AverageExpression(RatMouseStroma.obj, assays = "RNA", slot = "data", group.by = "mixed_label")$RNA
+RatMouseStroma_sd <- apply(RatMouseStroma_avg, 1, sd)
+RatMouseStroma_top_genes <- names(sort(RatMouseStroma_sd, decreasing = TRUE))[1:1000]
+
+RatMouseStroma_cols <- colnames(RatMouseStroma_avg)
+
+RatMouseStroma_cols <- grep("MEC", RatMouseStroma_cols, value = TRUE, invert = T)
+RatMouseStroma_cols <- grep("nmSC", RatMouseStroma_cols, value = TRUE, invert = T)
+RatMouseStroma_cols <- grep("TEPC", RatMouseStroma_cols, value = TRUE, invert = T)
+RatMouseStroma_cols <- grep("mimetic", RatMouseStroma_cols, value = TRUE, invert = T)
+RatMouseStroma_cols <- grep("fetal", RatMouseStroma_cols, value = TRUE, invert = T)
+
+RatMouseStroma_rat_cols <- c(grep("_Rat$", RatMouseStroma_cols, value = TRUE),
+                             grep("_Projected$", RatMouseStroma_cols, value = TRUE))
+RatMouseStroma_rat_cols <- grep("aaTEC", RatMouseStroma_rat_cols, value = TRUE, invert = T)
+
+
+RatMouseStroma_mouse_cols <- grep("_Mouse$", RatMouseStroma_cols , value = TRUE)
+
+RatMouseStroma_top_avg <- RatMouseStroma_avg[RatMouseStroma_top_genes, , drop = FALSE]
+RatMouseStroma_rat_avg <- RatMouseStroma_top_avg[, RatMouseStroma_rat_cols, drop = FALSE]
+RatMouseStroma_mouse_avg <- RatMouseStroma_top_avg[, RatMouseStroma_mouse_cols, drop = FALSE]
+
+RatMouseStroma_cor <- cor(as.matrix(RatMouseStroma_rat_avg),
+                              as.matrix(RatMouseStroma_mouse_avg),
+                              method = "pearson")
+pheatmap::pheatmap(RatMouseStroma_cor,
+                   cluster_rows = FALSE, cluster_cols = FALSE, cellwidth = 23, cellheight = 23, display_numbers = T,
+                   angle_col = 90)
+
 # Add projected clustering to the original rat thymocyte object
 proj <- RatMouseTEC_EC.obj$projected_label
 names(proj) <- colnames(RatMouseTEC_EC.obj)
@@ -1496,25 +1527,6 @@ DimPlot(RatMouseMesenchyme.obj, reduction = "umap.cca", split.by = "species",
         label = T, label.box = T, repel = T)+ xlim(-13, 0) + ylim(-4, 6)+
   theme(strip.text = element_text(size = 20, face = "bold"))
 ggsave(filename = "pic/Fig3A_2.pdf", plot = get_last_plot(), width = 12, height = 5)
-
-# examine similarities between rat and mouse mesenchymal subsets
-RatMouseMesenchyme_avg <- AverageExpression(RatMouseMesenchyme.obj, assays = "RNA", slot = "data")$RNA
-RatMouseMesenchyme_sd <- apply(RatMouseMesenchyme_avg, 1, sd)
-RatMouseMesenchyme_top_genes <- names(sort(RatMouseMesenchyme_sd, decreasing = TRUE))[1:1000]
-
-RatMouseMesenchyme_rat_cols <- grep("_Rat$", colnames(RatMouseMesenchyme_avg), value = TRUE)
-RatMouseMesenchyme_mouse_cols <- grep("_Mouse$", colnames(RatMouseMesenchyme_avg), value = TRUE)
-
-RatMouseMesenchyme_top_avg <- RatMouseMesenchyme_avg[RatMouseMesenchyme_top_genes, , drop = FALSE]
-RatMouseMesenchyme_rat_avg <- RatMouseMesenchyme_top_avg[, RatMouseMesenchyme_rat_cols, drop = FALSE]
-RatMouseMesenchyme_mouse_avg <- RatMouseMesenchyme_top_avg[, RatMouseMesenchyme_mouse_cols, drop = FALSE]
-
-RatMouseMesenchyme_cor <- cor(as.matrix(RatMouseMesenchyme_rat_avg),
-                              as.matrix(RatMouseMesenchyme_mouse_avg),
-                              method = "pearson")
-pdf("pic/Fig3D_RatMouseMesenchyme_cor_heatmap.pdf", width = 6.5, height = 5.5)
-heatmap(RatMouseMesenchyme_cor, Rowv = NA, Colv = NA, scale = "none", margins = c(8, 8))
-dev.off()
 
 # Fig. 3, 5.6 x 8 in
 FeaturePlot(RatMouseMesenchyme.obj, features = c("Ltbr controlled genes1", "Cd34", "Pdgfra", "Pdgfrb"),
