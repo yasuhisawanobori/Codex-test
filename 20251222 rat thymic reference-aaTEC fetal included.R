@@ -1130,16 +1130,16 @@ RatMouseStroma.obj <- RatMouseStroma.obj %>% FindNeighbors(reduction = "integrat
 DimPlot(RatMouseStroma.obj, reduction = "umap.PCA",  label = T, label.box = T, repel = T, split.by = "species")+NoLegend()
 
 RatMouseStroma.obj <- SetIdent(RatMouseStroma.obj, value = factor(RatMouseStroma.obj$merged_cluster,
-                               levels=c("Rat: capFb", "Rat: TMC1", "Rat: TMC2", "Rat: TMC3", "Rat: TMC4", "Rat: vSMC/PC",  
-                                        "Rat: Endo-1", "Rat: Endo-2", 
+                               levels=c("Rat: capFb", "Rat: TMC1", "Rat: TMC2", "Rat: TMC3", "Rat: TMC4", "Rat: vSMC/PC", 
                                         "Rat: TEC-a", "Rat: TEC-b", "Rat: TEC-c", "Rat: TEC-d", "Rat: TEC-e", 
+                                        "Rat: Endo-1", "Rat: Endo-2", 
                                         "Mouse: FB:capsFB", "Mouse: FB:intFB", "Mouse: FB:medFB",  "Mouse: vSMC/PC", "Mouse: vSMC/PC:fetal", "Mouse: Fat", "Mouse: FB:fetal", 
-                                        "Mouse: EC:capEC", "Mouse: EC:vEC", "Mouse: EC:aEC", "Mouse: MEC", "Mouse: EC:fetal",
                                         "Mouse: TEPC", "Mouse: TEC:early Pr", "Mouse: TEC:cTEC", "Mouse: TEC:mTEC1", "Mouse: TEC:mTEC-prol", "Mouse: TEC:mTEC2",
                                         "Mouse: TEC:aaTEC1", "Mouse: TEC:aaTEC2", 
                                         "Mouse: TEC:mimetic(tuft)", "Mouse: TEC:mimetic(parathyroid)", "Mouse: TEC:mimetic(basal)", 
                                         "Mouse: TEC:mimetic(microfold)", "Mouse: TEC:mimetic(goblet)", "Mouse: TEC:mimetic(muscle)", "Mouse: TEC:mimetic(neuroendo)",
-                                        "Mouse: TEC:mimetic(ciliated)", "Mouse: TEC:mimetic(ionocyte)", "Mouse: nmSC"
+                                        "Mouse: TEC:mimetic(ciliated)", "Mouse: TEC:mimetic(ionocyte)", "Mouse: nmSC",
+                                        "Mouse: EC:capEC", "Mouse: EC:vEC", "Mouse: EC:aEC", "Mouse: MEC", "Mouse: EC:fetal"
                                         )))
 
 saveRDS(RatMouseStroma.obj, "20240331 rat thymic stroma scPCR recounted/RatMouseStroma.rds")
@@ -1152,84 +1152,6 @@ RatMouseStroma.obj$species <- factor(RatMouseStroma.obj$species, levels = c("Rat
 DimPlot(RatMouseStroma.obj, reduction = "umap.cca", label.size = 2,
         label = T, label.box = T, repel = T, split.by = "species")+NoLegend()
 ggsave(filename = "pic/FigS2B.pdf", plot = get_last_plot(), width = 10, height = 5)
-
-# Epithelial markers
-DotPlot(RatMouseStroma.obj,
-        features = c("Epcam", "Krt5", "Krt8", "Krt18", "Cldn3", "Cldn4", "Dsp",
-                     "Aire", "Fezf2", "Tnfrsf11a", "Relb", "Ccl21"))+
-  RotatedAxis() & theme(axis.title = element_blank())
-
-FeaturePlot(RatMouseStroma.obj,
-            reduction = "umap.cca", split.by = "species", 
-            features = c("Aire", "Fezf2", "Tnfrsf11a", "Krt5", "Relb", "Ccl21")) & theme(axis.title = element_blank())
-
-RatMouseStroma.obj <- AddModuleScore(object = RatMouseStroma.obj, 
-                                     features = list(c("Epcam", "Krt5", "Krt8", "Krt18", "Cldn3", "Cldn4", "Dsp",
-                                                       "Aire", "Fezf2", "Tnfrsf11a", "Krt5", "Relb", "Ccl21")),
-                                     name = "Epithelial Score")
-FeaturePlot(RatMouseStroma.obj,"Epithelial Score1", reduction = "umap.cca", split.by = "species")
-VlnPlot(RatMouseStroma.obj,"Epithelial Score1")+NoLegend()
-
-# GOBP Epithelial Differentiation score
-library(msigdbr)
-GOBP_df <- msigdbr(species = "Mus musculus", category = "C5")
-r_ECD_genes <- GOBP_df[GOBP_df$gs_name=="GOBP_EPITHELIAL_CELL_DIFFERENTIATION",]$gene_symbol
-r_ECD_genes <- convert_orthologs(unique(r_ECD_genes), input_species = "mouse", output_species = "rat", drop_nonorths = F,
-                                 non121_strategy = 5, gene_output = "column")[, "ortholog_gene"]
-
-RatMouseStroma.obj <- AddModuleScore(object = RatMouseStroma.obj, features = list(r_ECD_genes), name = "Epithelial cell differentiation")
-FeaturePlot(RatMouseStroma.obj,"Epithelial cell differentiation1", reduction = "umap.cca", split.by = "species")
-VlnPlot(RatMouseStroma.obj,"Epithelial cell differentiation1")+NoLegend()
-
-# Mesenchymal markers
-DotPlot(RatMouseStroma.obj,
-        features = c("Vim", "Fn1", "Col1a1", "Col1a2", "Col4a1",
-                     "Tagln", "Lox", "Sparc"))+
-  RotatedAxis() & theme(axis.title = element_blank())
-
-RatMouseStroma.obj <- AddModuleScore(object = RatMouseStroma.obj, 
-                                     features = list(c("Vim", "Fn1", "Col1a1", "Col1a2", "Col4a1", "Tagln", "Lox", "Sparc",
-                                                       "Postn", "Dcn", "Lum", "Pdgfra", "Pdgfrb")),
-                                     name = "Mesenchymal Score")
-FeaturePlot(RatMouseStroma.obj,"Mesenchymal Score1", reduction = "umap.cca", split.by = "species")
-VlnPlot(RatMouseStroma.obj,"Mesenchymal Score1")+NoLegend()
-
-# GOBP Mesenchymal cell Differentiation score
-r_MCD_genes <- GOBP_df[GOBP_df$gs_name=="GOBP_MESENCHYMAL_CELL_DIFFERENTIATION",]$gene_symbol
-r_MCD_genes <- convert_orthologs(unique(r_MCD_genes), input_species = "mouse", output_species = "rat", drop_nonorths = F,
-                                 non121_strategy = 5, gene_output = "column")[, "ortholog_gene"]
-
-RatMouseStroma.obj <- AddModuleScore(object = RatMouseStroma.obj, features = list(r_MCD_genes), name = "Mesenchymal cell differentiation")
-FeaturePlot(RatMouseStroma.obj,"Mesenchymal cell differentiation1", reduction = "umap.cca", split.by = "species")
-VlnPlot(RatMouseStroma.obj,"Mesenchymal cell differentiation1")+NoLegend()
-
-# cell cycle
-s.genes <- tools::toTitleCase(tolower(cc.genes$s.genes))
-g2m.genes <- tools::toTitleCase(tolower(cc.genes$g2m.genes))
-
-RatMouseStroma.obj <-CellCycleScoring(RatMouseStroma.obj, s.features = as.character(convert_orthologs(as.data.frame(s.genes), input_species = "mouse", output_species = "rat", non121_strategy = 5, gene_input = "s.genes", gene_output = "dict"))
-                                                 , g2m.features = as.character(convert_orthologs(as.data.frame(g2m.genes), input_species = "mouse", output_species = "rat", non121_strategy = 5, gene_input = "g2m.genes", gene_output = "dict")))
-VlnPlot(RatMouseStroma.obj, features = c("S.Score","G2M.Score"))
-
-# EMT markers
-FeaturePlot(RatMouseStroma.obj,
-            reduction = "umap.cca", split.by = "species", 
-            features = c("Zeb1", "Zeb2", "Snai1", "Twist1")) & theme(axis.title = element_blank())
-
-# EMT gene score
-library(msigdbr)
-
-H_df <- msigdbr(species = "Mus musculus", category = "H")
-H_df["r_gene_symbol"] <- convert_orthologs(H_df, input_species = "mouse", output_species = "rat", drop_nonorths = F,
-                                           non121_strategy = 5, gene_input = "gene_symbol", gene_output = "column")[, "ortholog_gene"]
-H_df <- rename(H_df, m_gene_symbol = gene_symbol)
-H_df <- rename(H_df, gene_symbol = r_gene_symbol)
-
-r_EMT_genes <- H_df[H_df$gs_name=="HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION",]$gene_symbol
-
-RatMouseStroma.obj <- AddModuleScore(object = RatMouseStroma.obj, features = list(r_EMT_genes), name = "EMT hallmark")
-FeaturePlot(RatMouseStroma.obj,"EMT hallmark1", reduction = "umap.cca", split.by = "species")
-VlnPlot(RatMouseStroma.obj,"EMT hallmark1")+NoLegend()
 
 # Project mouse TEC/EC subsets to rat subsets
 RatMouseTEC_EC.obj <- 
@@ -1245,7 +1167,7 @@ RatMouseTEC_EC.obj <-
                                        "Mouse: TEC:mimetic(muscle)", "Mouse: TEC:mimetic(neuroendo)", 
                                        "Mouse: TEC:mimetic(ciliated)", "Mouse: TEC:mimetic(ionocyte)", 
                                        "Mouse: nmSC"))
-  
+
 project_labels_from_mouse <- function(
     obj,
     reduction     = c("cca","pca","umap.cca","umap"),
@@ -1349,7 +1271,6 @@ RatMouseStroma.obj$mixed_label <- ifelse(is.na(RatMouseStroma.obj$mixed_label),
 
 RatMouseStroma.obj$mixed_label <- factor(RatMouseStroma.obj$mixed_label,
                                          levels = c("Rat: capFb", "Rat: TMC1", "Rat: TMC2", "Rat: TMC3", "Rat: TMC4", "Rat: vSMC/PC",
-                                                    "Projected: EC:capEC", "Projected: EC:vEC", "Projected: EC:aEC","Projected: EC:fetal",
                                                     "Projected: MEC", "Projected: TEPC",
                                                     "Projected: TEC:early Pr", "Projected: TEC:cTEC", "Projected: TEC:mTEC1",
                                                     "Projected: TEC:mTEC-prol", "Projected: TEC:mTEC2",
@@ -1358,19 +1279,120 @@ RatMouseStroma.obj$mixed_label <- factor(RatMouseStroma.obj$mixed_label,
                                                     "Projected: TEC:mimetic(goblet)", "Projected: TEC:mimetic(muscle)",
                                                     "Projected: TEC:mimetic(neuroendo)", 
                                                     "Projected: TEC:mimetic(ionocyte)", "Projected: nmSC", 
+                                                    "Projected: EC:capEC", "Projected: EC:vEC", "Projected: EC:aEC","Projected: EC:fetal",
                                                     "Mouse: FB:capsFB", "Mouse: FB:intFB", "Mouse: FB:medFB",  "Mouse: vSMC/PC", "Mouse: vSMC/PC:fetal", "Mouse: Fat", "Mouse: FB:fetal", 
-                                                    "Mouse: EC:capEC", "Mouse: EC:vEC", "Mouse: EC:aEC", "Mouse: MEC", "Mouse: EC:fetal",
                                                     "Mouse: TEPC", "Mouse: TEC:early Pr", "Mouse: TEC:cTEC", "Mouse: TEC:mTEC1", "Mouse: TEC:mTEC-prol", "Mouse: TEC:mTEC2",
                                                     "Mouse: TEC:aaTEC1", "Mouse: TEC:aaTEC2", 
                                                     "Mouse: TEC:mimetic(tuft)", "Mouse: TEC:mimetic(parathyroid)", "Mouse: TEC:mimetic(basal)", 
                                                     "Mouse: TEC:mimetic(microfold)", "Mouse: TEC:mimetic(goblet)", "Mouse: TEC:mimetic(muscle)", "Mouse: TEC:mimetic(neuroendo)",
-                                                    "Mouse: TEC:mimetic(ciliated)", "Mouse: TEC:mimetic(ionocyte)", "Mouse: nmSC"))
+                                                    "Mouse: TEC:mimetic(ciliated)", "Mouse: TEC:mimetic(ionocyte)", "Mouse: nmSC",
+                                                    "Mouse: EC:capEC", "Mouse: EC:vEC", "Mouse: EC:aEC", "Mouse: MEC", "Mouse: EC:fetal"))
 
-                                                     
+
 DimPlot(subset(RatMouseStroma.obj, subset=species %in% "Rat"), group.by = "mixed_label", 
-        reduction = "umap.cca", label = T, label.box = T, repel = T, label.size = 2)+
+        reduction = "umap.cca", label = T, label.box = T, repel = T, label.size = 3)+
   NoLegend() + ggtitle("Projected labels to Rat")
 ggsave(filename = "pic/FigS2B_2.pdf", plot = get_last_plot(), width = 6, height = 5)
+
+saveRDS(RatMouseStroma.obj, "20240331 rat thymic stroma scPCR recounted/RatMouseStroma.rds")
+RatMouseStroma.obj <- readRDS("20240331 rat thymic stroma scPCR recounted/RatMouseStroma.rds")
+
+# Epithelial markers
+DotPlot(RatMouseStroma.obj,
+        features = c("Epcam", "Krt5", "Krt8", "Krt18", "Cldn3", "Cldn4", "Dsp",
+                     "Aire", "Fezf2", "Tnfrsf11a", "Relb", "Ccl21"))+
+  RotatedAxis() & theme(axis.title = element_blank())
+
+FeaturePlot(RatMouseStroma.obj,
+            reduction = "umap.cca", split.by = "species", 
+            features = c("Aire", "Fezf2", "Tnfrsf11a", "Krt5", "Relb", "Ccl21")) & theme(axis.title = element_blank())
+
+RatMouseStroma.obj <- AddModuleScore(object = RatMouseStroma.obj, 
+                                     features = list(c("Epcam", "Krt5", "Krt8", "Krt18", "Cldn3", "Cldn4", "Dsp",
+                                                       "Aire", "Fezf2", "Tnfrsf11a", "Krt5", "Relb", "Ccl21")),
+                                     name = "Epithelial Score")
+FeaturePlot(RatMouseStroma.obj,"Epithelial Score1", reduction = "umap.cca", split.by = "species")
+VlnPlot(RatMouseStroma.obj,"Epithelial Score1")+NoLegend()
+
+# GOBP Epithelial Differentiation score
+library(msigdbr)
+GOBP_df <- msigdbr(species = "Mus musculus", category = "C5")
+r_ECD_genes <- GOBP_df[GOBP_df$gs_name=="GOBP_EPITHELIAL_CELL_DIFFERENTIATION",]$gene_symbol
+r_ECD_genes <- convert_orthologs(unique(r_ECD_genes), input_species = "mouse", output_species = "rat", drop_nonorths = F,
+                                 non121_strategy = 5, gene_output = "column")[, "ortholog_gene"]
+
+RatMouseStroma.obj <- AddModuleScore(object = RatMouseStroma.obj, features = list(r_ECD_genes), name = "Epithelial cell differentiation")
+FeaturePlot(RatMouseStroma.obj,"Epithelial cell differentiation1", reduction = "umap.cca", split.by = "species")
+VlnPlot(RatMouseStroma.obj,"Epithelial cell differentiation1")+NoLegend()
+
+# Mesenchymal markers
+DotPlot(RatMouseStroma.obj,
+        features = c("Vim", "Fn1", "Col1a1", "Col1a2", "Col4a1",
+                     "Tagln", "Lox", "Sparc"))+
+  RotatedAxis() & theme(axis.title = element_blank())
+
+RatMouseStroma.obj <- AddModuleScore(object = RatMouseStroma.obj, 
+                                     features = list(c("Vim", "Fn1", "Col1a1", "Col1a2", "Col4a1", "Tagln", "Lox", "Sparc",
+                                                       "Postn", "Dcn", "Lum", "Pdgfra", "Pdgfrb")),
+                                     name = "Mesenchymal Score")
+FeaturePlot(RatMouseStroma.obj,"Mesenchymal Score1", reduction = "umap.cca", split.by = "species")
+VlnPlot(RatMouseStroma.obj,"Mesenchymal Score1")+NoLegend()
+
+# GOBP Mesenchymal cell Differentiation score
+r_MCD_genes <- GOBP_df[GOBP_df$gs_name=="GOBP_MESENCHYMAL_CELL_DIFFERENTIATION",]$gene_symbol
+r_MCD_genes <- convert_orthologs(unique(r_MCD_genes), input_species = "mouse", output_species = "rat", drop_nonorths = F,
+                                 non121_strategy = 5, gene_output = "column")[, "ortholog_gene"]
+
+RatMouseStroma.obj <- AddModuleScore(object = RatMouseStroma.obj, features = list(r_MCD_genes), name = "Mesenchymal cell differentiation")
+FeaturePlot(RatMouseStroma.obj,"Mesenchymal cell differentiation1", reduction = "umap.cca", split.by = "species")
+VlnPlot(RatMouseStroma.obj,"Mesenchymal cell differentiation1")+NoLegend()
+
+# cell cycle
+s.genes <- tools::toTitleCase(tolower(cc.genes$s.genes))
+g2m.genes <- tools::toTitleCase(tolower(cc.genes$g2m.genes))
+
+RatMouseStroma.obj <-CellCycleScoring(RatMouseStroma.obj, s.features = as.character(convert_orthologs(as.data.frame(s.genes), input_species = "mouse", output_species = "rat", non121_strategy = 5, gene_input = "s.genes", gene_output = "dict"))
+                                                 , g2m.features = as.character(convert_orthologs(as.data.frame(g2m.genes), input_species = "mouse", output_species = "rat", non121_strategy = 5, gene_input = "g2m.genes", gene_output = "dict")))
+VlnPlot(RatMouseStroma.obj, features = c("S.Score","G2M.Score"))
+
+# EMT markers
+FeaturePlot(RatMouseStroma.obj,
+            reduction = "umap.cca", split.by = "species", 
+            features = c("Zeb1", "Zeb2", "Snai1", "Twist1")) & theme(axis.title = element_blank())
+
+# EMT gene score
+library(msigdbr)
+
+H_df <- msigdbr(species = "Mus musculus", category = "H")
+H_df["r_gene_symbol"] <- convert_orthologs(H_df, input_species = "mouse", output_species = "rat", drop_nonorths = F,
+                                           non121_strategy = 5, gene_input = "gene_symbol", gene_output = "column")[, "ortholog_gene"]
+H_df <- rename(H_df, m_gene_symbol = gene_symbol)
+H_df <- rename(H_df, gene_symbol = r_gene_symbol)
+
+r_EMT_genes <- H_df[H_df$gs_name=="HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION",]$gene_symbol
+
+RatMouseMesenchymeTEC.obj <- SetIdent(RatMouseStroma.obj, value = RatMouseStroma.obj$mixed_label)
+
+RatMouseMesenchymeTEC.obj <- subset(RatMouseMesenchymeTEC.obj, idents=c("Rat: capFb", "Rat: TMC1", 
+                                                                 "Rat: TMC2", "Rat: TMC3", "Rat: TMC4", "Rat: vSMC/PC", 
+                                                                 "Projected: TEC:mTEC1", "Projected: TEC:mTEC2", 
+                                                                 "Mouse: FB:capsFB", "Mouse: FB:intFB", "Mouse: FB:medFB", "Mouse: vSMC/PC", 
+                                                                 "Mouse: TEC:mTEC1", "Mouse: TEC:mTEC2",
+                                                                 "Mouse: TEC:aaTEC2"))
+
+
+RatMouseMesenchymeTEC.obj <- AddModuleScore(object = RatMouseMesenchymeTEC.obj, features = list(r_EMT_genes), name = "EMT hallmark")
+RatMouseMesenchymeTEC.obj[["EMT hallmark"]] <- RatMouseMesenchymeTEC.obj[["EMT hallmark1"]]
+FeaturePlot(RatMouseMesenchymeTEC.obj,"EMT hallmark", reduction = "umap.cca", split.by = "species")
+VlnPlot(RatMouseMesenchymeTEC.obj,"EMT hallmark")+NoLegend()
+
+DotPlot(RatMouseMesenchymeTEC.obj, head(r_EMT_genes, 30))+RotatedAxis()
+DotPlot(RatMouseMesenchymeTEC.obj, r_EMT_genes[31:60])+RotatedAxis()
+DotPlot(RatMouseMesenchymeTEC.obj, r_EMT_genes[61:90])+RotatedAxis()
+DotPlot(RatMouseMesenchymeTEC.obj, r_EMT_genes[91:120])+RotatedAxis()
+DotPlot(RatMouseMesenchymeTEC.obj, unique(r_EMT_genes[121:150]))+RotatedAxis()
+DotPlot(RatMouseMesenchymeTEC.obj, unique(r_EMT_genes[151:180]))+RotatedAxis()
+DotPlot(RatMouseMesenchymeTEC.obj, unique(r_EMT_genes[180:206]))+RotatedAxis()
 
 # examine similarities between rat and mouse stromal subsets
 RatMouseStroma_avg <- AverageExpression(RatMouseStroma.obj, assays = "RNA", slot = "data", group.by = "mixed_label")$RNA
@@ -1402,6 +1424,7 @@ RatMouseStroma_cor <- cor(as.matrix(RatMouseStroma_rat_avg),
 pheatmap::pheatmap(RatMouseStroma_cor,
                    cluster_rows = FALSE, cluster_cols = FALSE, cellwidth = 23, cellheight = 23, display_numbers = T,
                    angle_col = 90)
+grDevices::dev.copy2pdf(file="pic/FigS2C.pdf", width=7.7, height=6.8)
 
 # Add projected clustering to the original rat thymocyte object
 proj <- RatMouseTEC_EC.obj$projected_label
@@ -1507,8 +1530,9 @@ PMID_32839611LtbrControlled_rat <-
 RatMouseStroma.obj <- AddModuleScore(object = RatMouseStroma.obj,
                                  features = list(PMID_32839611LtbrControlled_rat),
                                  name = "Ltbr controlled genes")
-FeaturePlot(RatMouseStroma.obj,"Ltbr controlled genes1", reduction = "umap.cca", split.by = "species")
-DotPlot(RatMouseStroma.obj,"Ltbr controlled genes1")
+RatMouseStroma.obj[["Ltbr controlled genes"]] <- RatMouseStroma.obj[["Ltbr controlled genes1"]]
+FeaturePlot(RatMouseStroma.obj,"Ltbr controlled genes", reduction = "umap.cca", split.by = "species")
+DotPlot(RatMouseStroma.obj,"Ltbr controlled genes")
 
 #remap mesenchymal cell subsets
 unique(Idents(RatMouseStroma.obj))
@@ -1519,7 +1543,7 @@ RatMouseMesenchyme.obj <- subset(RatMouseStroma.obj, idents = c("Mouse: FB:capsF
                                                         "Rat: TMC4", "Rat: vSMC/PC"))
 DimPlot(RatMouseMesenchyme.obj, reduction = "umap.cca", split.by = "species")
 
-DimPlot(RatMouseMesenchyme.obj, reduction = "umap.cca", group.by = "species")+ xlim(-13, 2) + ylim(-4, 6)+NoLegend()+
+DimPlot(RatMouseMesenchyme.obj, reduction = "umap.cca", group.by = "species")+ xlim(-13, 0) + ylim(-4, 6)+NoLegend()+
   ggtitle(NULL)
 ggsave(filename = "pic/Fig3A_1.pdf", plot = get_last_plot(), width = 5, height = 4)
 
@@ -1528,10 +1552,26 @@ DimPlot(RatMouseMesenchyme.obj, reduction = "umap.cca", split.by = "species",
   theme(strip.text = element_text(size = 20, face = "bold"))
 ggsave(filename = "pic/Fig3A_2.pdf", plot = get_last_plot(), width = 12, height = 5)
 
-# Fig. 3, 5.6 x 8 in
-FeaturePlot(RatMouseMesenchyme.obj, features = c("Ltbr controlled genes1", "Cd34", "Pdgfra", "Pdgfrb"),
+FeaturePlot(RatMouseMesenchyme.obj, features = c("Ltbr controlled genes", "Cd34", "Pdgfra", "Pdgfrb"),
             reduction = "umap.cca", split.by = "species") & coord_cartesian(xlim = c(-13, 0), ylim = c(-4, 6)) & theme(axis.title = element_blank())
 ggsave(filename = "pic/Fig3C.pdf", plot = get_last_plot(), width = 5.6, height = 8, device = cairo_pdf)
+
+DotPlot(RatMouseMesenchyme.obj, features = c("Ltbr controlled genes", "Cd34", "Pdgfra", "Pdpn", "Pdgfrb", "RT1-Bb")) & theme(axis.title = element_blank())+RotatedAxis()
+
+VlnPlot(subset(MouseThymicStroma.obj, subset=genotype %in% "Foxn1-tdTom"), "tdT-WPRE-trans")
+DotPlot(subset(MouseThymicStroma.obj, subset=genotype %in% "Aire-CreERT2"), "GFP")
+
+FeaturePlot(RatMouseMesenchyme.obj, features = c("Cdh1", "Esrp1", "Epcam", "Ovol2", 
+                                                 "Vim", "Notch3", "Olfm2", "Spp1", "Prrx1",
+                                                 "Zeb2", "Snai1", "Twist1", "Thy1", "Pdgfra"),
+            reduction = "umap.cca", split.by = "species") & # mouse mFb dominant
+  coord_cartesian(xlim = c(-13, 0), ylim = c(-4, 6)) & theme(axis.title = element_blank())
+
+DotPlot(RatMouseMesenchyme.obj, features = c("Cdh1", "Esrp1", "Epcam", "Ovol2", 
+                                              "Vim", "Notch3", "Olfm2", "Spp1", "Prrx1",
+                                              "Zeb2", "Snai1", "Twist1", "Thy1", "Pdgfra"))+RotatedAxis()
+
+DotPlot(RatMouseMesenchyme.obj, features = c("Cdh1", "Vim"), split.by = "species") 
 
 orth_MouseRat <- orthogene::report_orthologs(target_species = "mouse", reference_species = "rat", method_all_genes = "gprofiler", non121_strategy = "4") 
 
@@ -1980,14 +2020,12 @@ dev.off()
 
 lr_out <- subsetCommunication(cellchat_m, sources.use = c("FB: medFB"), targets.use = "Mature CD4-1")
 
-# Fig. 3, 3.2 x 6.5 in
 netVisual_bubble(
   cellchat_m,
   sources.use   = c("FB:medFB"),
   targets.use   = "Mature CD4-1",
   remove.isolate = TRUE,
   font.size      = 15)
-ggsave(filename = "pic/Fig3D_1.pdf", plot = get_last_plot(), width = 3.2, height = 6.5)
 
 netVisual_bubble(
   cellchat_m,
@@ -2116,7 +2154,6 @@ d_plot <- combined_long %>%
          p_show = ifelse(is.finite(-log10(pval)), -log10(pval), NA_real_),
          shape_flag = ifelse(!is.na(pval) & pval < 0.01, "p<0.01", "ns"))%>%
   mutate(pval = suppressWarnings(as.numeric(pval)),
-         # categorize p-values; treat 0 as p<0.01
          p_cat = case_when(
            !is.na(pval) & pval <= 0.01 ~ "p<0.01",
            !is.na(pval) & pval <= 0.05 ~ "0.01<p<=0.05",
