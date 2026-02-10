@@ -1130,24 +1130,24 @@ RatMouseStroma.obj <- RatMouseStroma.obj %>% FindNeighbors(reduction = "integrat
 DimPlot(RatMouseStroma.obj, reduction = "umap.PCA",  label = T, label.box = T, repel = T, split.by = "species")+NoLegend()
 
 RatMouseStroma.obj <- SetIdent(RatMouseStroma.obj, value = factor(RatMouseStroma.obj$merged_cluster,
-                               levels=c("Rat: capFb", "Rat: TMC1", "Rat: TMC2", "Rat: TMC3", "Rat: TMC4", "Rat: vSMC/PC", 
-                                        "Rat: TEC-a", "Rat: TEC-b", "Rat: TEC-c", "Rat: TEC-d", "Rat: TEC-e", 
-                                        "Rat: Endo-1", "Rat: Endo-2", 
-                                        "Mouse: FB:capsFB", "Mouse: FB:intFB", "Mouse: FB:medFB",  "Mouse: vSMC/PC", "Mouse: vSMC/PC:fetal", "Mouse: Fat", "Mouse: FB:fetal", 
+                               levels=c("Mouse: FB:capsFB", "Mouse: FB:intFB", "Mouse: FB:medFB",  "Mouse: vSMC/PC", "Mouse: vSMC/PC:fetal", "Mouse: Fat", "Mouse: FB:fetal", 
                                         "Mouse: TEPC", "Mouse: TEC:early Pr", "Mouse: TEC:cTEC", "Mouse: TEC:mTEC1", "Mouse: TEC:mTEC-prol", "Mouse: TEC:mTEC2",
                                         "Mouse: TEC:aaTEC1", "Mouse: TEC:aaTEC2", 
                                         "Mouse: TEC:mimetic(tuft)", "Mouse: TEC:mimetic(parathyroid)", "Mouse: TEC:mimetic(basal)", 
                                         "Mouse: TEC:mimetic(microfold)", "Mouse: TEC:mimetic(goblet)", "Mouse: TEC:mimetic(muscle)", "Mouse: TEC:mimetic(neuroendo)",
                                         "Mouse: TEC:mimetic(ciliated)", "Mouse: TEC:mimetic(ionocyte)", "Mouse: nmSC",
-                                        "Mouse: EC:capEC", "Mouse: EC:vEC", "Mouse: EC:aEC", "Mouse: MEC", "Mouse: EC:fetal"
+                                        "Mouse: EC:capEC", "Mouse: EC:vEC", "Mouse: EC:aEC", "Mouse: MEC", "Mouse: EC:fetal",
+                                        "Rat: capFb", "Rat: TMC1", "Rat: TMC2", "Rat: TMC3", "Rat: TMC4", "Rat: vSMC/PC", 
+                                        "Rat: TEC-a", "Rat: TEC-b", "Rat: TEC-c", "Rat: TEC-d", "Rat: TEC-e", 
+                                        "Rat: Endo-1", "Rat: Endo-2"
                                         )))
+
+RatMouseStroma.obj$species <- factor(RatMouseStroma.obj$species, levels = c("Mouse", "Rat"))
 
 saveRDS(RatMouseStroma.obj, "20240331 rat thymic stroma scPCR recounted/RatMouseStroma.rds")
 RatMouseStroma.obj <- readRDS("20240331 rat thymic stroma scPCR recounted/RatMouseStroma.rds")
 
 DimPlot(RatMouseStroma.obj, reduction = "umap.cca", group.by = "species") # check the distribution
-
-RatMouseStroma.obj$species <- factor(RatMouseStroma.obj$species, levels = c("Rat", "Mouse"))
 
 DimPlot(RatMouseStroma.obj, reduction = "umap.cca", label.size = 2,
         label = T, label.box = T, repel = T, split.by = "species")+NoLegend()
@@ -1270,7 +1270,14 @@ RatMouseStroma.obj$mixed_label <- ifelse(is.na(RatMouseStroma.obj$mixed_label),
                                          as.character(RatMouseStroma.obj$merged_cluster), RatMouseStroma.obj$mixed_label)
 
 RatMouseStroma.obj$mixed_label <- factor(RatMouseStroma.obj$mixed_label,
-                                         levels = c("Rat: capFb", "Rat: TMC1", "Rat: TMC2", "Rat: TMC3", "Rat: TMC4", "Rat: vSMC/PC",
+                                         levels = c("Mouse: FB:capsFB", "Mouse: FB:intFB", "Mouse: FB:medFB",  "Mouse: vSMC/PC", "Mouse: vSMC/PC:fetal", "Mouse: Fat", "Mouse: FB:fetal", 
+                                                    "Mouse: TEPC", "Mouse: TEC:early Pr", "Mouse: TEC:cTEC", "Mouse: TEC:mTEC1", "Mouse: TEC:mTEC-prol", "Mouse: TEC:mTEC2",
+                                                    "Mouse: TEC:aaTEC1", "Mouse: TEC:aaTEC2", 
+                                                    "Mouse: TEC:mimetic(tuft)", "Mouse: TEC:mimetic(parathyroid)", "Mouse: TEC:mimetic(basal)", 
+                                                    "Mouse: TEC:mimetic(microfold)", "Mouse: TEC:mimetic(goblet)", "Mouse: TEC:mimetic(muscle)", "Mouse: TEC:mimetic(neuroendo)",
+                                                    "Mouse: TEC:mimetic(ciliated)", "Mouse: TEC:mimetic(ionocyte)", "Mouse: nmSC",
+                                                    "Mouse: EC:capEC", "Mouse: EC:vEC", "Mouse: EC:aEC", "Mouse: MEC", "Mouse: EC:fetal",
+                                                    "Rat: capFb", "Rat: TMC1", "Rat: TMC2", "Rat: TMC3", "Rat: TMC4", "Rat: vSMC/PC",
                                                     "Projected: MEC", "Projected: TEPC",
                                                     "Projected: TEC:early Pr", "Projected: TEC:cTEC", "Projected: TEC:mTEC1",
                                                     "Projected: TEC:mTEC-prol", "Projected: TEC:mTEC2",
@@ -1279,14 +1286,7 @@ RatMouseStroma.obj$mixed_label <- factor(RatMouseStroma.obj$mixed_label,
                                                     "Projected: TEC:mimetic(goblet)", "Projected: TEC:mimetic(muscle)",
                                                     "Projected: TEC:mimetic(neuroendo)", 
                                                     "Projected: TEC:mimetic(ionocyte)", "Projected: nmSC", 
-                                                    "Projected: EC:capEC", "Projected: EC:vEC", "Projected: EC:aEC","Projected: EC:fetal",
-                                                    "Mouse: FB:capsFB", "Mouse: FB:intFB", "Mouse: FB:medFB",  "Mouse: vSMC/PC", "Mouse: vSMC/PC:fetal", "Mouse: Fat", "Mouse: FB:fetal", 
-                                                    "Mouse: TEPC", "Mouse: TEC:early Pr", "Mouse: TEC:cTEC", "Mouse: TEC:mTEC1", "Mouse: TEC:mTEC-prol", "Mouse: TEC:mTEC2",
-                                                    "Mouse: TEC:aaTEC1", "Mouse: TEC:aaTEC2", 
-                                                    "Mouse: TEC:mimetic(tuft)", "Mouse: TEC:mimetic(parathyroid)", "Mouse: TEC:mimetic(basal)", 
-                                                    "Mouse: TEC:mimetic(microfold)", "Mouse: TEC:mimetic(goblet)", "Mouse: TEC:mimetic(muscle)", "Mouse: TEC:mimetic(neuroendo)",
-                                                    "Mouse: TEC:mimetic(ciliated)", "Mouse: TEC:mimetic(ionocyte)", "Mouse: nmSC",
-                                                    "Mouse: EC:capEC", "Mouse: EC:vEC", "Mouse: EC:aEC", "Mouse: MEC", "Mouse: EC:fetal"))
+                                                    "Projected: EC:capEC", "Projected: EC:vEC", "Projected: EC:aEC","Projected: EC:fetal"))
 
 
 DimPlot(subset(RatMouseStroma.obj, subset=species %in% "Rat"), group.by = "mixed_label", 
@@ -1296,6 +1296,19 @@ ggsave(filename = "pic/FigS2B_2.pdf", plot = get_last_plot(), width = 6, height 
 
 saveRDS(RatMouseStroma.obj, "20240331 rat thymic stroma scPCR recounted/RatMouseStroma.rds")
 RatMouseStroma.obj <- readRDS("20240331 rat thymic stroma scPCR recounted/RatMouseStroma.rds")
+
+# Add projected clustering to the original rat thymocyte object
+proj <- RatMouseTEC_EC.obj$projected_label
+names(proj) <- colnames(RatMouseTEC_EC.obj)
+proj <- proj[grep("^RatStroma_", names(proj))]
+names(proj) <- sub("^RatStroma_", "", names(proj))
+aligned <- proj[colnames(RatThymicStroma.obj)]
+names(aligned) <- colnames(RatThymicStroma.obj)
+RatThymicStroma.obj <- Seurat::AddMetaData(RatThymicStroma.obj, metadata = aligned, col.name = "projected_label")
+
+DimPlot(RatThymicStroma.obj, group.by = "projected_label")
+
+saveRDS(RatThymicStroma.obj, file = "20240331 rat thymic stroma scPCR recounted/RatThymicStroma.rds")
 
 # Epithelial markers
 DotPlot(RatMouseStroma.obj,
@@ -1411,7 +1424,6 @@ RatMouseStroma_rat_cols <- c(grep("_Rat$", RatMouseStroma_cols, value = TRUE),
                              grep("_Projected$", RatMouseStroma_cols, value = TRUE))
 RatMouseStroma_rat_cols <- grep("aaTEC", RatMouseStroma_rat_cols, value = TRUE, invert = T)
 
-
 RatMouseStroma_mouse_cols <- grep("_Mouse$", RatMouseStroma_cols , value = TRUE)
 
 RatMouseStroma_top_avg <- RatMouseStroma_avg[RatMouseStroma_top_genes, , drop = FALSE]
@@ -1426,18 +1438,35 @@ pheatmap::pheatmap(RatMouseStroma_cor,
                    angle_col = 90)
 grDevices::dev.copy2pdf(file="pic/FigS2C.pdf", width=7.7, height=6.8)
 
-# Add projected clustering to the original rat thymocyte object
-proj <- RatMouseTEC_EC.obj$projected_label
-names(proj) <- colnames(RatMouseTEC_EC.obj)
-proj <- proj[grep("^RatStroma_", names(proj))]
-names(proj) <- sub("^RatStroma_", "", names(proj))
-aligned <- proj[colnames(RatThymicStroma.obj)]
-names(aligned) <- colnames(RatThymicStroma.obj)
-RatThymicStroma.obj <- Seurat::AddMetaData(RatThymicStroma.obj, metadata = aligned, col.name = "projected_label")
+# all-gene heatmap for selected rat/mouse stromal subsets
+RatMouseStroma_heatmap_cols <- c("g capFb_Rat", "g TMC1_Rat", "g TMC2_Rat", "g TMC3_Rat", "g TMC4_Rat",
+                                 "g vSMC/PC_Rat", "mTEC1_ TEC_Projected", "mTEC2_ TEC_Projected", "capsFB_ FB_Mouse",
+                                 "intFB_ FB_Mouse", "medFB_ FB_Mouse", "g vSMC/PC_Mouse", "mTEC1_ TEC_Mouse",
+                                 "mTEC2_ TEC_Mouse", "aaTEC2_ TEC_Mouse")
+missing_heatmap_cols <- setdiff(RatMouseStroma_heatmap_cols, colnames(RatMouseStroma_avg))
+if (length(missing_heatmap_cols) > 0) {
+  stop(paste("Missing requested columns in RatMouseStroma_avg:", paste(missing_heatmap_cols, collapse = ", ")))
+}
 
-DimPlot(RatThymicStroma.obj, group.by = "projected_label")
+RatMouseStroma_selected_avg <- RatMouseStroma_avg[, RatMouseStroma_heatmap_cols, drop = FALSE]
+RatMouseStroma_selected_sd <- apply(RatMouseStroma_selected_avg, 1, sd)
+RatMouseStroma_selected_top_genes <- names(sort(RatMouseStroma_selected_sd, decreasing = TRUE))[1:min(200, nrow(RatMouseStroma_selected_avg))]
+RatMouseStroma_selected_top_avg <- RatMouseStroma_selected_avg[RatMouseStroma_selected_top_genes, , drop = FALSE]
 
-saveRDS(RatThymicStroma.obj, file = "20240331 rat thymic stroma scPCR recounted/RatThymicStroma.rds")
+show_row_names_heatmap <- nrow(RatMouseStroma_selected_top_avg) <= 1500
+
+pheatmap::pheatmap(as.matrix(RatMouseStroma_selected_top_avg),
+                   cluster_rows = TRUE,
+                   cluster_cols = FALSE,
+                   show_rownames = show_row_names_heatmap,
+                   fontsize_row = 1,
+                   fontsize_col = 10,
+                   cellheight = 0.8,
+                   cellwidth = 16,
+                   angle_col = 90,
+                   width = 10,
+                   height = 20)
+filename = "pic/all_genes_selected_subsets.pdf"
 
 ## remap endothelial cell subsets
 DimPlot(subset(RatMouseStroma.obj, 
@@ -1538,10 +1567,9 @@ DotPlot(RatMouseStroma.obj,"Ltbr controlled genes")
 unique(Idents(RatMouseStroma.obj))
 
 RatMouseMesenchyme.obj <- subset(RatMouseStroma.obj, idents = c("Mouse: FB:capsFB", "Mouse: FB:intFB", "Mouse: FB:medFB", "Mouse: vSMC/PC", 
-                                                                "Mouse: TEC:aaTEC2",
+                                                                "Mouse: TEC:aaTEC2", 
                                                         "Rat: TMC1", "Rat: TMC2", "Rat: TMC3", "Rat: capFb",
                                                         "Rat: TMC4", "Rat: vSMC/PC"))
-DimPlot(RatMouseMesenchyme.obj, reduction = "umap.cca", split.by = "species")
 
 DimPlot(RatMouseMesenchyme.obj, reduction = "umap.cca", group.by = "species")+ xlim(-13, 0) + ylim(-4, 6)+NoLegend()+
   ggtitle(NULL)
@@ -1561,15 +1589,53 @@ DotPlot(RatMouseMesenchyme.obj, features = c("Ltbr controlled genes", "Cd34", "P
 VlnPlot(subset(MouseThymicStroma.obj, subset=genotype %in% "Foxn1-tdTom"), "tdT-WPRE-trans")
 DotPlot(subset(MouseThymicStroma.obj, subset=genotype %in% "Aire-CreERT2"), "GFP")
 
-FeaturePlot(RatMouseMesenchyme.obj, features = c("Cdh1", "Esrp1", "Epcam", "Ovol2", 
+FeaturePlot(RatMouseStroma.obj, features = c("Cdh1", "Esrp1", "Epcam", "Ovol2", 
                                                  "Vim", "Notch3", "Olfm2", "Spp1", "Prrx1",
                                                  "Zeb2", "Snai1", "Twist1", "Thy1", "Pdgfra"),
             reduction = "umap.cca", split.by = "species") & # mouse mFb dominant
   coord_cartesian(xlim = c(-13, 0), ylim = c(-4, 6)) & theme(axis.title = element_blank())
 
-DotPlot(RatMouseMesenchyme.obj, features = c("Cdh1", "Esrp1", "Epcam", "Ovol2", 
-                                              "Vim", "Notch3", "Olfm2", "Spp1", "Prrx1",
-                                              "Zeb2", "Snai1", "Twist1", "Thy1", "Pdgfra"))+RotatedAxis()
+aaTEC2markers <- FindMarkers(MouseThymicStroma.obj, "TEC:aaTEC2")
+
+DotPlot(subset(RatMouseStroma.obj, subset=mixed_label%in% c("Mouse: FB:capsFB", "Mouse: FB:intFB", "Mouse: FB:medFB", "Mouse: vSMC/PC",  "Mouse: TEC:aaTEC2", 
+                                                            "Mouse: TEC:mTEC1", "Mouse: TEC:mTEC2",
+                                                            "Rat: TMC1", "Rat: TMC2", "Rat: TMC3", "Rat: capFb", "Rat: TMC4", "Rat: vSMC/PC",
+                                                            "Projected: TEC:mTEC1", "Projected: TEC:mTEC2"
+                                                            )),
+        group.by = "mixed_label", features = c("Cdh1", "Esrp1", "Epcam", # mTEC
+                                              "Snai1", "Twist1", "Thy1", "Pdgfra", # Fbs only
+                                              "Vim", "Notch3", "Prrx1", "Zeb2", # Fib aaTEC2 included
+                                              "Olfm2", "Spp1"  # aaTEC2 only
+                                              ))+RotatedAxis()+
+  scale_y_discrete(limits = rev(c("Rat: capFb", "Rat: TMC1", "Rat: TMC2", "Rat: TMC3", "Rat: TMC4", "Rat: vSMC/PC",
+                                  "Projected: TEC:mTEC1", "Projected: TEC:mTEC2",
+                                  "Mouse: FB:capsFB", "Mouse: FB:intFB", "Mouse: FB:medFB", "Mouse: vSMC/PC", 
+                                  "Mouse: TEC:mTEC1", "Mouse: TEC:mTEC2", "Mouse: TEC:aaTEC2"
+                                  )))+
+  scale_size_area(
+    max_size = 5,                         # visual max dot (adjust)
+    limits   = c(0, 75),                 # clamp range
+    breaks   = c(0, 20, 75), labels = c("0", "15", "75"), trans="log1p")&
+  theme(axis.title = element_blank())
+
+DotPlot(subset(RatMouseStroma.obj, subset=mixed_label%in% c("Mouse: FB:capsFB", "Mouse: FB:intFB", "Mouse: FB:medFB", "Mouse: vSMC/PC",  "Mouse: TEC:aaTEC2", 
+                                                            "Mouse: TEC:mTEC1", "Mouse: TEC:mTEC2",
+                                                            "Rat: TMC1", "Rat: TMC2", "Rat: TMC3", "Rat: capFb", "Rat: TMC4", "Rat: vSMC/PC",
+                                                            "Projected: TEC:mTEC1", "Projected: TEC:mTEC2"
+)),
+group.by = "mixed_label", features = c("Gria1", "Olfm2", "Nos1", "Trim9", "Ephb1", "Gucy1a1", "Ano1",
+                                       "Frmd5", "Trpm3", "Gm31641", "Cacnb2"
+))+RotatedAxis()+
+  scale_y_discrete(limits = rev(c("Rat: capFb", "Rat: TMC1", "Rat: TMC2", "Rat: TMC3", "Rat: TMC4", "Rat: vSMC/PC",
+                                  "Projected: TEC:mTEC1", "Projected: TEC:mTEC2",
+                                  "Mouse: FB:capsFB", "Mouse: FB:intFB", "Mouse: FB:medFB", "Mouse: vSMC/PC", 
+                                  "Mouse: TEC:mTEC1", "Mouse: TEC:mTEC2", "Mouse: TEC:aaTEC2"
+  )))+
+  scale_size_area(
+    max_size = 5,                         # visual max dot (adjust)
+    limits   = c(0, 75),                 # clamp range
+    breaks   = c(0, 20, 75), labels = c("0", "15", "75"), trans="log1p")&
+  theme(axis.title = element_blank())
 
 DotPlot(RatMouseMesenchyme.obj, features = c("Cdh1", "Vim"), split.by = "species") 
 
@@ -2141,13 +2207,9 @@ combined_long <- bind_rows(d_m, d_r)
 library(ggplot2)
 
 # order of columns on x-axis
-cols <- c("FB:medFB -> Mature CD4-1", "FB:medFB -> Mature CD4-2",
-          "TEC:mTEC2 -> Mature CD4-1", "TEC:mTEC2 -> Mature CD4-2",
-          
-          "TMC3 -> Projected: Mature CD4-1","TMC3 -> Projected: Mature CD4-2",
-          "TMC4 -> Projected: Mature CD4-1", "TMC4 -> Projected: Mature CD4-2",
-          "Projected: TEC:mTEC2 -> Projected: Mature CD4-1", "Projected: TEC:mTEC2 -> Projected: Mature CD4-2",
-          "TEC:aaTEC2 -> Mature CD4-1", "TEC:aaTEC2 -> Mature CD4-2")
+cols <- c("FB:medFB -> Mature CD4-2", "TEC:mTEC2 -> Mature CD4-2",
+          "TMC3 -> Projected: Mature CD4-2", "TMC4 -> Projected: Mature CD4-2", "Projected: TEC:mTEC2 -> Projected: Mature CD4-2",
+          "TEC:aaTEC2 -> Mature CD4-2")
 
 d_plot <- combined_long %>%
   mutate(x_label = factor(x_label, levels = cols),
@@ -2169,9 +2231,9 @@ pair_order <- c("Ccl19  - Ccr7", "Icam1  - (Itgal+Itgb2)", "Icam1  - Itgal",
                 "App - Sorl1",  
                 "Fn1  - (Itga4+Itgb7)", "Lpar1 - Adgre5", "Nectin2  - Cd226", 
                 "RT1-M3-1  - Cd8a", "RT1-CE1  - Cd8a", "Lrrc4c - Ptprf",
-               "RT1-S3  - Cd8a", "Mdk  - (Itga4+Itgb1)", "Fn1  - (Itga4+Itgb1)", "Mdk  - (Itga6+Itgb1)", "Penk  - Oprm1", "Tgfb2  - (Tgfbr1+Tgfbr2)", 
+               "RT1-S3  - Cd8a", "Mdk  - (Itga4+Itgb1)", "Fn1  - (Itga4+Itgb1)", 
+               "Mdk  - (Itga6+Itgb1)", "Penk  - Oprm1", "Tgfb2  - (Tgfbr1+Tgfbr2)", 
                "Lamb2  - (Itga6+Itgb1)", "Lama2  - (Itga6+Itgb1)", 
-               
                "Igf1  - Igf1r", "Thbs1  - Cd47", "Cxcl12  - Cxcr4", 
                 "Il6  - (Il6r+Il6st)", "Il7  - (Il7r+Il2rg)", "Jag1  - Notch1", 
                 "Thbs2  - Cd47", 
@@ -2200,5 +2262,5 @@ ggplot(d_plot, aes(x = x_label, y = pair)) +
   theme_bw(12) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
         panel.grid.minor = element_blank())
-ggsave(filename = "pic/Fig3D.pdf", plot = get_last_plot(), width = 4, height = 12)
+ggsave(filename = "pic/Fig3D.pdf", plot = get_last_plot(), width = 4.5, height = 12)
 
