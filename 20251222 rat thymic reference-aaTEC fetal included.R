@@ -854,6 +854,9 @@ DimPlot(subset(Rat_MouseThymocyte.obj, subset=orig.ident=="RatThymocyte"),
   ggtitle("Projected labels to Rat")
 ggsave(filename = "pic/FigS1E_2.pdf", plot = get_last_plot(), width = 5, height = 5)
 
+saveRDS(Rat_MouseThymocyte.obj, "20250904 Rat thymocyte scRNA-seq/Rat_MouseThymocyte.obj.rds")
+Rat_MouseThymocyte.obj <- readRDS("20250904 Rat thymocyte scRNA-seq/Rat_MouseThymocyte.obj.rds")
+
 # Add projected clustering to the original rat thymocyte object
 proj <- Rat_MouseThymocyte.obj$projected_label
 names(proj) <- colnames(Rat_MouseThymocyte.obj)
@@ -1475,7 +1478,7 @@ DimPlot(subset(RatMouseStroma.obj,
                    "Mouse: EC:capEC", "Mouse: EC:vEC", "Mouse: EC:aEC")),
         reduction = "umap.cca", group.by = "species")+  xlim(-6.5, -2.5) + ylim(-14, -6)+
   ggtitle(NULL)+NoLegend()
-ggsave(filename = "pic/Fig4A_1.pdf", plot = get_last_plot(), width = 5, height = 3)
+ggsave(filename = "pic/Fig5A_1.pdf", plot = get_last_plot(), width = 5, height = 3)
 
 
 DimPlot(subset(RatMouseStroma.obj, 
@@ -1485,7 +1488,7 @@ DimPlot(subset(RatMouseStroma.obj,
         reduction = "umap.cca", split.by = "species",
         group.by = "mixed_label", label = T, label.box = T)+
   xlim(-6.5, -2.5) + ylim(-14, -6)+ theme(strip.text = element_text(size = 20, face = "bold"))  + ggtitle(NULL)
-ggsave(filename = "pic/Fig4A_2.pdf", plot = get_last_plot(), width = 12, height = 4)
+ggsave(filename = "pic/Fig5A_2.pdf", plot = get_last_plot(), width = 12, height = 4)
 
 FeaturePlot(subset(RatMouseStroma.obj, 
                    subset= mixed_label %in% 
@@ -1516,7 +1519,7 @@ DotPlot(subset(RatMouseStroma.obj,
                       plot.margin        = margin(t = 2, r = 5, b = 5, l = 5)) +
   scale_y_discrete(limits = c("Mouse: EC:capEC", "Mouse: EC:vEC", "Mouse: EC:aEC",
                               "Projected: EC:capEC", "Projected: EC:vEC", "Projected: EC:aEC"))
-ggsave(filename = "pic/Fig4C.pdf", plot = get_last_plot(), width = 3.8, height = 2.9)
+ggsave(filename = "pic/Fig5C.pdf", plot = get_last_plot(), width = 3.8, height = 2.9)
 
 FeaturePlot(subset(RatMouseStroma.obj, 
                    subset= mixed_label %in% 
@@ -1546,7 +1549,7 @@ DotPlot(subset(RatMouseStroma.obj,
     max_size = 5,                         # visual max dot (adjust)
     limits   = c(0, 100),                 # clamp range
     breaks   = c(1, 10, 100), labels = c("1", "10", "100"), trans="log1p")
-ggsave(filename = "pic/Fig4D.pdf", plot = get_last_plot(), width = 3.8, height = 2.9)
+ggsave(filename = "pic/Fig5D.pdf", plot = get_last_plot(), width = 3.8, height = 2.9)
 
 
 #Ltbr controlled gene expression in Rat and Mouse stroma
@@ -1580,9 +1583,9 @@ DimPlot(RatMouseMesenchyme.obj, reduction = "umap.cca", split.by = "species",
   theme(strip.text = element_text(size = 20, face = "bold"))
 ggsave(filename = "pic/Fig3A_2.pdf", plot = get_last_plot(), width = 12, height = 5)
 
-FeaturePlot(RatMouseMesenchyme.obj, features = c("Ltbr controlled genes", "Cd34", "Pdgfra", "Pdgfrb"),
+FeaturePlot(RatMouseMesenchyme.obj, features = c("Ltbr controlled genes", "Cd34", "Pdgfra", "Pdgfrb", "Acta2"),
             reduction = "umap.cca", split.by = "species") & coord_cartesian(xlim = c(-13, 0), ylim = c(-4, 6)) & theme(axis.title = element_blank())
-ggsave(filename = "pic/Fig3C.pdf", plot = get_last_plot(), width = 5.6, height = 8, device = cairo_pdf)
+ggsave(filename = "pic/Fig3C.pdf", plot = get_last_plot(), width = 5.6, height = 12, device = cairo_pdf)
 
 DotPlot(RatMouseMesenchyme.obj, features = c("Ltbr controlled genes", "Cd34", "Pdgfra", "Pdpn", "Pdgfrb", "RT1-Bb")) & theme(axis.title = element_blank())+RotatedAxis()
 
@@ -1642,49 +1645,83 @@ DotPlot(RatMouseMesenchyme.obj, features = c("Cdh1", "Vim"), split.by = "species
 orth_MouseRat <- orthogene::report_orthologs(target_species = "mouse", reference_species = "rat", method_all_genes = "gprofiler", non121_strategy = "4") 
 
 FeaturePlot(RatMouseMesenchyme.obj, features = c("Tslp", "Lgals5", "RT1-S3", "RT1-N3", "RT1-CE1"),  reduction = "umap.cca", split.by = "species") & # mouse mFb dominant
-  coord_cartesian(xlim = c(-13, 2), ylim = c(-6, 6)) & theme(axis.title = element_blank())
+  coord_cartesian(xlim = c(-13, 0), ylim = c(-4, 6)) & theme(axis.title = element_blank())
 FeaturePlot(RatMouseMesenchyme.obj, features = c("Thy1", "Thbs1", "Thbs2", "Tgfb2", "Penk"),  reduction = "umap.cca", split.by = "species") & # Rat mFb dominant 1
-  coord_cartesian(xlim = c(-13, 2), ylim = c(-6, 6)) & theme(axis.title = element_blank())
+  coord_cartesian(xlim = c(-13, 0), ylim = c(-4, 6)) & theme(axis.title = element_blank())
 FeaturePlot(RatMouseMesenchyme.obj, features = c("Nectin2", "Mdk", "Lpar1", "Lamb1", "Lama2"),  reduction = "umap.cca", split.by = "species") & # Rat mFb dominant 2
-  coord_cartesian(xlim = c(-13, 2), ylim = c(-6, 6)) & theme(axis.title = element_blank())
+  coord_cartesian(xlim = c(-13, 0), ylim = c(-4, 6)) & theme(axis.title = element_blank())
 FeaturePlot(RatMouseMesenchyme.obj, features = c("Jag1", "Il6", "Il7", "Icoslg"),  reduction = "umap.cca", split.by = "species") & # Rat mFb dominant 3
-  coord_cartesian(xlim = c(-13, 2), ylim = c(-6, 6)) & theme(axis.title = element_blank())
+  coord_cartesian(xlim = c(-13, 0), ylim = c(-4, 6)) & theme(axis.title = element_blank())
 FeaturePlot(RatMouseMesenchyme.obj, features = c("Fn1", "Cxcl12", "Ccl21", "Ccl19", "App", "Itgav", "Itgb1"),  reduction = "umap.cca", split.by = "species") & # Rat mFb dominant 4
-  coord_cartesian(xlim = c(-13, 2), ylim = c(-6, 6)) & theme(axis.title = element_blank())
+  coord_cartesian(xlim = c(-13, 0), ylim = c(-4, 6)) & theme(axis.title = element_blank())
 
-# Fig. 3, 4 x 7 in
 DotPlot(subset(RatMouseStroma.obj, subset = mixed_label %in% c("Mouse: FB:medFB", "Mouse: TEC:mTEC2",
-                                           "Rat: TMC3", "Rat: TMC4", "Projected: TEC:mTEC2")), 
+                                           "Rat: TMC3", "Rat: TMC4", "Projected: TEC:mTEC2", "Mouse: TEC:aaTEC2")), 
         group.by = "mixed_label",
-        features =  rev(c("Lgals5", "RT1-S3", "RT1-N3", "RT1-CE1", "Tslp",
+        features =  rev(c("RT1-Bb", "Lgals5", "RT1-CE1", "RT1-N3", "RT1-S3", "Tslp",
                           "Ccl21", "Icoslg",
                           "Itgav", "Itgb1",
-                          "App", "Cxcl12", "Fn1", "Lpar1", "Nectin2",
-                          "Lama2", "Mdk", "Penk", "Tgfb2",
-                          "Thbs1", "Il6", "Il7", "Jag1", "Lamb1", "Thbs2", "Thy1")))+
+                          "App", "Fn1", "Lpar1", "Nectin2", "RT1-M3-1", "Lrrc4c",
+                           "Mdk", "Penk", "Tgfb2", "Lamb2", "Lama2", "Igf1",
+                          "Thbs1", "Cxcl12", "Il6", "Il7", "Jag1", "Thbs2", "Thy1", "Lamb1", "Grn")))+
   RotatedAxis()+theme(axis.title = element_blank(), axis.text.x  = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-    coord_flip() +  scale_y_discrete(limits = c("Mouse: FB:medFB", "Mouse: TEC:mTEC2", "Rat: TMC3", "Rat: TMC4", "Projected: TEC:mTEC2")) +
+    coord_flip() +  scale_y_discrete(limits = c("Mouse: FB:medFB", "Mouse: TEC:mTEC2", "Rat: TMC3", "Rat: TMC4", "Projected: TEC:mTEC2", "Mouse: TEC:aaTEC2")) +
   theme(
     legend.title = element_text(size = 12, angle = 90),
     legend.text  = element_text(size = 11, angle = 90)  # fallback for older ggplot2
   )
-ggsave(filename = "pic/Fig3E.pdf", plot = get_last_plot(), width = 2.8, height = 7.8)
+
 
 DotPlot(subset(Rat_MouseThymocyte.obj, idents=c("Projected: Mature CD4-1", "Mouse: Mature CD4-1")), 
         features =  c("Crlf2", "Ighm", "Ptprc", "Cd8b", "Adgre5", "Cd47", "Tgfbr1", "Tgfbr2", "Oprm1", "Cd226",
                       "Itga4", "Itga6", "Itgb1", "Notch1", "Il6r", "Il6st", "Il7r", "Il2rg", "Icos", "Cd28", 
-                       "Itgb7", "Ccr7", "Sorl1"))+
+                       "Itgb7", "Ccr7", "Sorl1", "Adgre5", "Sort1"))+
   RotatedAxis()+theme(axis.title = element_blank(), axis.text.x  = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
-# Fig. 3, 5.6 x 5.7. in
 FeaturePlot(RatMouseMesenchyme.obj, features = c("Lgals5", "RT1-CE1", "Tslp"),  reduction = "umap.cca", split.by = "species") & # mouse mFb dominant
-  coord_cartesian(xlim = c(-13, 2), ylim = c(-6, 6)) & theme(axis.title = element_blank())
-ggsave(filename = "pic/Fig3F.pdf", plot = get_last_plot(), width = 5.6, height = 5.7)
+  coord_cartesian(xlim = c(-13, 0), ylim = c(-4, 6)) & theme(axis.title = element_blank())
+ggsave(filename = "pic/Fig4C.pdf", plot = get_last_plot(), width = 5.6, height = 6.2)
 
-# Fig. 3, 5.6 x 12 in
-FeaturePlot(RatMouseMesenchyme.obj, features = c("Ccl21", "Icoslg", "Thbs1", "Il7"),  reduction = "umap.cca", split.by = "species") & # Rat mFb dominant
-  coord_cartesian(xlim = c(-13, 2), ylim = c(-6, 6)) & theme(axis.title = element_blank())
-ggsave(filename = "pic/Fig3G.pdf", plot = get_last_plot(), width = 5.6, height = 7.8)
+FeaturePlot(RatMouseMesenchyme.obj, features = c("Ccl21", "Icoslg", "Lrrc4c", "Thbs1", "Il7"),  reduction = "umap.cca", split.by = "species") & # Rat mFb dominant
+  coord_cartesian(xlim = c(-13, 0), ylim = c(-4, 6)) & theme(axis.title = element_blank())
+ggsave(filename = "pic/Fig4D.pdf", plot = get_last_plot(), width = 5.6, height = 10)
+
+VlnPlot(RatMouseMesenchyme.obj, features = c("Ccl21", "Icoslg", "Lrrc4c", "Thbs1", "Il7"), stack = T, flip = T) +
+  scale_x_discrete(limits = c("Mouse: FB:capsFB", "Mouse: FB:intFB", "Mouse: FB:medFB", "Mouse: vSMC/PC", 
+                              "Rat: capFb", "Rat: TMC1", "Rat: TMC2", "Rat: TMC3", "Rat: TMC4", "Rat: vSMC/PC",
+                              "Mouse: TEC:aaTEC2")) +
+  NoLegend() & theme(axis.title = element_blank(), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+VlnPlot(RatMouseMesenchyme.obj, features = c("RT1-Bb", "Icam1", "Lgals5", "RT1-CE1", "RT1-N3", "RT1-S3", "Tslp",
+                                             "Ccl21", "Icoslg",
+                                             "Itgav", "Itgb1",
+                                             "App", "Fn1", "Lpar1", "Nectin2", "RT1-M3-1", "Lrrc4c",
+                                             "Mdk", "Penk", "Tgfb2", "Lamb2", "Lama2", "Igf1",
+                                             "Thbs1", "Cxcl12", "Il6", "Il7", "Jag1", "Thbs2", "Thy1", "Lamb1", "Grn"), stack = T, flip = T) +
+  scale_x_discrete(limits = c( "Mouse: FB:medFB",  
+                              "Rat: TMC3", "Rat: TMC4",
+                              "Mouse: TEC:aaTEC2")) +
+  NoLegend() & theme(axis.title = element_blank(), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+ggsave(filename = "pic/Fig4B.pdf", plot = get_last_plot(), width = 3, height = 10)
+
+# receptor expression on mature thymocytes
+RatMouseMatureThymoyte.obj <- subset(JoinLayers(Rat_MouseThymocyte.obj), ident= c("Mouse: Mature CD4-2", "Projected: Mature CD4-2"))
+
+VlnPlot(RatMouseMatureThymoyte.obj, features = c("Spnl1", "Cd8b", "Cd8a", "Adgre5", "Sorl1", "Itga4", "Itgb1", "Itga6", "Tgfbr1", "Tgfbr2",
+                                                 "Igf1r", "Cxcr4"), stack = T, flip = T)+
+  NoLegend() & theme(axis.title = element_blank(), axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+ggsave(filename = "pic/Fig4B_2.pdf", plot = get_last_plot(), width = 1.8, height = 5)
+
+
+FeaturePlot(RatMouseMesenchyme.obj, features = c("App", "Fn1", "Lpar1", "Lrrc4c", "lamb2", "Mdk"),  reduction = "umap.cca", split.by = "species") & # Rat mFb dominant
+  coord_cartesian(xlim = c(-13, 0), ylim = c(-4, 6)) & theme(axis.title = element_blank())
+
+FeaturePlot(RatMouseMesenchyme.obj, features = c("Nectin2", "Penk", "Tgfb2", "Lamb2", "Lama2", "Igf1", "Thbs1"),  reduction = "umap.cca", split.by = "species") & # Rat mFb dominant
+  coord_cartesian(xlim = c(-13, 0), ylim = c(-4, 6)) & theme(axis.title = element_blank())
+
+FeaturePlot(RatMouseMesenchyme.obj, features = c("Cxcl12", "Il6", "Jag1", "Thbs2", "Thy1", "Lamb1"),  reduction = "umap.cca", split.by = "species") & # Rat mFb dominant
+  coord_cartesian(xlim = c(-13, 0), ylim = c(-4, 6)) & theme(axis.title = element_blank())
+
 
 DotPlot(subset(RatMouseStroma.obj, subset=mixed_label %in% 
                  c("Mouse: FB:capsFB", "Mouse: FB:intFB", "Mouse: FB:medFB", "Mouse: vSMC/PC",
@@ -1703,14 +1740,14 @@ DotPlot(subset(RatMouseStroma.obj, subset=mixed_label %in%
     max_size = 5,                         # visual max dot (adjust)
     limits   = c(0.1, 100),                 # clamp range
     breaks   = c(0.1, 50, 100), labels = c("0.1", "50", "100"))
-ggsave(filename = "pic/Fig3H.pdf", plot = get_last_plot(), width = 4.2, height = 3.2)
+ggsave(filename = "pic/Fig4E.pdf", plot = get_last_plot(), width = 4.2, height = 3.2)
 
 FeaturePlot(RatMouseMesenchyme.obj,
         split.by = "species",
         reduction = "umap.cca",
         features =  c("Sphk1","Sphk2", "Spns2", "Sgpl1", "Plpp3"))&
-  coord_cartesian(xlim = c(-13, 2), ylim = c(-6, 6)) & theme(axis.title = element_blank())
-ggsave(filename = "pic/Fig3I.pdf", plot = get_last_plot(), width = 5.6, height = 9.9)
+  coord_cartesian(xlim = c(-13, 0), ylim = c(-4, 6)) & theme(axis.title = element_blank())
+ggsave(filename = "pic/Fig4F.pdf", plot = get_last_plot(), width = 5.6, height = 9.9)
 
 
 # check rat or mouse only-genes caused by artifacts
@@ -1998,7 +2035,6 @@ dev.off()
 
 lr_out <- subsetCommunication(cellchat, sources.use = c("TMC4"), targets.use = "Projected: Mature CD4-1")
 
-# Fig. 3, 3.2 x 9.2 in
 netVisual_bubble(
   cellchat,
   sources.use   = c("TMC3","TMC4", "Projected: TEC:mTEC1", "Projected: TEC:mTEC2"),
@@ -2006,7 +2042,6 @@ netVisual_bubble(
   remove.isolate = TRUE,
   angle.x        = 90,
   font.size      = 12)
-ggsave(filename = "pic/Fig3D_2.pdf", plot = get_last_plot(), width = 3.2, height = 9.2)
 
 netVisual_bubble(
   cellchat,
@@ -2015,7 +2050,6 @@ netVisual_bubble(
   remove.isolate = TRUE,
   angle.x        = 90,
   font.size      = 12)
-ggsave(filename = "pic/Fig3D_2.pdf", plot = get_last_plot(), width = 3.2, height = 9.2)
 
 netVisual_bubble(
   cellchat,
@@ -2104,8 +2138,9 @@ netVisual_bubble(
 #make combined table
 FbmTECvsCD4_m <- CellChat::subsetCommunication(cellchat_m, 
                               sources.use = c("FB:medFB","TEC:aaTEC2", "TEC:mTEC2"), 
-                              targets.use = c("Mature CD4-1", "Mature CD4-2"))
+                              targets.use = c("Mature CD4-2"))
 
+FbmTECvsCD4_m$interaction_name_2[FbmTECvsCD4_m$interaction_name_2 =="Icam1  - Spn"] <- "Icam1  - Spnl1"
 FbmTECvsCD4_m$interaction_name_2[FbmTECvsCD4_m$interaction_name_2 =="Ccl21a  - Ccr7"] <- "Ccl21  - Ccr7"
 FbmTECvsCD4_m$interaction_name_2[FbmTECvsCD4_m$interaction_name_2 =="Lgals9  - Cd45"] <- "Lgals5  - Cd45"
 FbmTECvsCD4_m$interaction_name_2[FbmTECvsCD4_m$interaction_name_2 =="Lgals9  - Ighm"] <- "Lgals5  - Ighm"
@@ -2134,7 +2169,7 @@ FbmTECvsCD4_m$interaction_name_2[FbmTECvsCD4_m$interaction_name_2 =="H2-ob  - Cd
 
 FbmTECvsCD4_r <- CellChat::subsetCommunication(cellchat,
                                    sources.use = c("TMC3","TMC4", "Projected: TEC:mTEC2"),
-                                   targets.use = c("Projected: Mature CD4-1", "Projected: Mature CD4-2"))
+                                   targets.use = c("Projected: Mature CD4-2"))
 
 FbmTECvsCD4_r$interaction_name_2[FbmTECvsCD4_r$interaction_name_2 =="Icosl  - Cd28"] <- "Icoslg  - Cd28"
 FbmTECvsCD4_r$interaction_name_2[FbmTECvsCD4_r$interaction_name_2 =="Icosl  - Icos"] <- "Icoslg  - Icos"
@@ -2220,11 +2255,12 @@ d_plot <- combined_long %>%
            !is.na(pval) & pval <= 0.01 ~ "p<0.01",
            !is.na(pval) & pval <= 0.05 ~ "0.01<p<=0.05",
            TRUE                                ~ "ns"
-         ), .keep = "unused")
+         ), .keep = "unused") %>%
+  filter(!is.na(x_label))  # remove rows whose source->target label is not in `cols`
 
 # order of columns on Y-axis
 pair_order <- c("Ccl19  - Ccr7", "Icam1  - (Itgal+Itgb2)", "Icam1  - Itgal", 
-                "Mdk  - Ncl", "Ptn  - Ncl", "RT1-Bb  - Cd4", "Icam1  - Spn", "Lgals5  - Cd45", 
+                "Mdk  - Ncl", "Ptn  - Ncl", "RT1-Bb  - Cd4", "Icam1  - Spnl1", "Lgals5  - Cd45", 
                 "Lgals5  - Ighm", "RT1-CE1  - Cd8b", "RT1-N3  - Cd8b", 
                 "RT1-S3  - Cd8b", "Tslp  - (Il7r+Crlf2)", "Ccl21  - Ccr7", 
                 "Icoslg  - Cd28", "Icoslg  - Icos", "(Itgav+Itgb1) - Adgre5", 
@@ -2262,5 +2298,6 @@ ggplot(d_plot, aes(x = x_label, y = pair)) +
   theme_bw(12) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
         panel.grid.minor = element_blank())
-ggsave(filename = "pic/Fig3D.pdf", plot = get_last_plot(), width = 4.5, height = 12)
+ggsave(filename = "pic/Fig4A.pdf", plot = get_last_plot(), width = 4.2, height = 12)
 
+#Test
