@@ -704,12 +704,160 @@ ggsave(filename = "pic/figS3_5.pdf", plot = get_last_plot(), width = 7, height =
 
 plot_rctd_bar_simple(subset(bin20_obj, subset = RCTD_top2_conf == T)@meta.data, group_col="RCTD_top2", levels=lvl, y_limits=c(1,300000), y_log = T)+
   theme(axis.title.x = element_blank(), axis.title.y = element_blank()) 
-ggsave(filename = "pic/figS3_6.pdf", plot = get_last_plot(), width = 7, height = 4.5, units = "in")
 
 plot_rctd_bar_simple(subset(bin20_obj, subset = RCTD_top3_conf == T)@meta.data, group_col="RCTD_top3", levels=lvl, y_limits=c(1,300000), y_log = T)+
   theme(axis.title.x = element_blank(), axis.title.y = element_blank()) 
-ggsave(filename = "pic/figS3_7.pdf", plot = get_last_plot(), width = 7, height = 4.5, units = "in")
 
+
+plot_rctd_top_ratio <- function(
+    obj_or_md,
+    top1_col = "RCTD_top1",
+    compare_col = "RCTD_top2",   # e.g. RCTD_top2 or RCTD_top3
+    levels = lvl,
+    drop_na = TRUE,
+    ratio_label = NULL,
+    y_limits = NULL,
+    bar_fill = "grey40",
+    bar_width = 0.8,
+    y_log1_centered = T,
+    filter_conf_false = T,
+    top1_conf_col = paste0(top1_col, "_conf"),
+    compare_conf_col = paste0(compare_col, "_conf")
+) {
+  library(dplyr); library(ggplot2); library(tibble)
+  
+  md <- if (inherits(obj_or_md, "Seurat")) obj_or_md@meta.data else obj_or_md
+  md <- as_tibble(md)
+  
+  to_chr <- function(x) {
+    if (is.list(x)) {
+      vapply(x, function(y) if (length(y)) as.character(y[[1]]) else NA_character_, character(1))
+    } else {
+      as.character(x)
+    }
+  }
+  
+  to_lgl <- function(x, n) {
+    if (is.null(x)) return(rep(NA, n))
+    if (is.list(x)) {
+      vapply(x, function(y) if (length(y)) as.logical(y[[1]]) else NA, logical(1))
+    } else {
+      as.logical(x)
+    }
+  }
+  
+  n <- nrow(md)
+  top1 <- if (top1_col %in% names(md)) to_chr(md[[top1_col]]) else rep(NA_character_, n)
+  topx <- if (compare_col %in% names(md)) to_chr(md[[compare_col]]) else rep(NA_character_, n)
+  
+  if (filter_conf_false) {
+    top1_conf <- if (top1_conf_col %in% names(md)) to_lgl(md[[top1_conf_col]], n) else rep(NA, n)
+    topx_conf <- if (compare_conf_col %in% names(md)) to_lgl(md[[compare_conf_col]], n) else rep(NA, n)
+    
+    top1[top1_conf %in% FALSE] <- NA_character_
+    topx[topx_conf %in% FALSE] <- NA_character_
+  }
+  
+  if (drop_na) {
+    top1 <- top1[!is.na(top1)]
+    topx <- topx[!is.na(topx)]
+  }
+  
+  n_top1 <- tibble(group = top1) |>
+    filter(!is.na(group)) |>
+    count(group, name = "n_top1")
+  
+  n_topx <- tibble(group = topx) |>
+    filter(!is.na(group)) |>
+    count(group, name = "n_topx")
+  
+  df <- full_join(n_top1, n_topx, by = "group") |>
+    mutate(
+      n_top1 = coalesce(n_top1, 0L),
+      n_topx = coalesce(n_topx, 0L),
+      ratio = if_else(n_top1 > 0, n_topx / n_top1, NA_real_),
+      ratio_plot = ratio,
+      group = if (is.null(levels)) factor(group) else factor(group, levels = levels)
+    ) |>
+    arrange(group)
+  
+  y_lab <- if (is.null(ratio_label)) {
+    "RCTD_topN/RCTD_top1"
+  } else {
+    ratio_label
+  }
+  
+  if (y_log1_centered) {
+    ratio_floor <- if (!is.null(y_limits) && length(y_limits) >= 1 && is.finite(y_limits[1]) && y_limits[1] > 0) {
+      y_limits[1]
+    } else {
+      pos_min <- suppressWarnings(min(df$ratio[df$ratio > 0], na.rm = TRUE))
+      if (is.finite(pos_min)) pos_min / 2 else 1e-4
+    }
+    df <- df |>
+      mutate(ratio_plot = if_else(!is.na(ratio) & ratio <= 0, ratio_floor, ratio))
+  }
+  
+  # label positions: always above bars for readability
+  if (y_log1_centered) {
+    df <- df |>
+      mutate(
+        label = if_else(is.na(ratio), NA_character_, sprintf("%.3f", ratio)),
+        label_y = if_else(is.na(ratio_plot), NA_real_, ratio_plot * if_else(ratio_plot >= 1, 1.06, 1.14))
+      )
+  } else {
+    ymax_ratio <- suppressWarnings(max(df$ratio, na.rm = TRUE))
+    if (!is.finite(ymax_ratio)) ymax_ratio <- 1
+    df <- df |>
+      mutate(
+        label = if_else(is.na(ratio), NA_character_, sprintf("%.3f", ratio)),
+        label_y = if_else(is.na(ratio), NA_real_, ratio + ymax_ratio * 0.03)
+      )
+  }
+  
+  p <- ggplot(df, aes(x = group, y = if (y_log1_centered) ratio_plot else ratio)) +
+    geom_col(fill = bar_fill, width = bar_width) +
+    geom_label(
+      aes(y = label_y, label = label),
+      size = 2.8,
+      label.size = 0,
+      fill = "white",
+      color = "black",
+      label.padding = grid::unit(0.08, "lines"),
+      na.rm = TRUE
+    ) +
+    labs(x = NULL, y = y_lab) +
+    theme_classic() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      axis.text = element_text(size = 12),
+      axis.title = element_text(size = 13),
+      plot.margin = margin(t = 10, r = 6, b = 6, l = 6)
+    ) +
+    coord_cartesian(clip = "off")
+  
+  if (y_log1_centered) {
+    p <- p + scale_y_log10(
+      limits = y_limits,
+      breaks = scales::breaks_log(n = 7),
+      labels = scales::label_number(accuracy = 0.01),
+      expand = ggplot2::expansion(mult = c(0, 0.16))
+    )
+  } else if (!is.null(y_limits)) {
+    p <- p + scale_y_continuous(limits = y_limits, expand = ggplot2::expansion(mult = c(0, 0.16)))
+  }
+  
+  list(plot = p, data = df)
+}
+
+options(tibble.print_max = Inf, tibble.width = Inf)
+plot_rctd_top_ratio(bin20_obj, top1_col = "RCTD_top1",  compare_col = "RCTD_top2",
+                    ratio_label = "RCTD Top2/Top1")
+ggsave(filename = "pic/figS3_6.pdf", plot = get_last_plot(), width = 7, height = 4.5, units = "in")
+
+plot_rctd_top_ratio(bin20_obj, top1_col = "RCTD_top1",  compare_col = "RCTD_top3",
+                    ratio_label = "RCTD Top3/Top1")
+ggsave(filename = "pic/figS3_7.pdf", plot = get_last_plot(), width = 7, height = 4.5, units = "in")
 # RCTD-predicted cell ratio in thymic regions----
 plot_subset_ratio <- function(
     obj_or_md, target,
